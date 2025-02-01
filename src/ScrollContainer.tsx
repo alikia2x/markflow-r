@@ -9,12 +9,11 @@ import {
 import { animated as a, useSpring } from "react-spring";
 import ResizeObserver from "resize-observer-polyfill";
 import { throttle } from "lodash-es";
-import StreamMarkdown from "./StreamMarkdown";
 
 const SCROLL_THRESHOLD = 250;
 const SCROLL_THROTTLE = 300;
 
-const MarkdownContainer = ({ content }) => {
+const ScrollableContainer = ({ children, contentIndicator }) => {
     const [spring, setSpring] = useSpring(() => ({
         y: 0,
         config: {
@@ -58,7 +57,7 @@ const MarkdownContainer = ({ content }) => {
                 clearTimeout(contentUpdateTimeoutRef.current);
             }
         };
-    }, [content]);
+    }, [contentIndicator]);
 
     // 同步最新高度到ref
     useEffect(() => {
@@ -158,7 +157,7 @@ const MarkdownContainer = ({ content }) => {
     return (
         <div
             ref={containerRef}
-            className="relative h-full"
+            className="relative h-full mb-4 overflow-y-hidden"
         >
             <a.div
                 style={{
@@ -169,10 +168,10 @@ const MarkdownContainer = ({ content }) => {
                 }}
                 ref={viewportRef}
             >
-                <StreamMarkdown content={content}/>
+                {children}
             </a.div>
         </div>
     );
 };
 
-export default MarkdownContainer;
+export default ScrollableContainer;

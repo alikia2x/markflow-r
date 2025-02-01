@@ -65,7 +65,7 @@ const StreamMarkdown = ({ content }: StreamMarkdownProps) => {
 	}, [content, md]);
 
 	return (
-		<div ref={containerRef} className="markdown py-4">
+		<div ref={containerRef} className="markdown w-full">
 			{tokens.map((token, index) => renderToken(token, index))}
 		</div>
 	);

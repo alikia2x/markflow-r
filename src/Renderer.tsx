@@ -1,6 +1,7 @@
 import { MarkedToken } from "./global";
 import hljs from "highlight.js";
 import "highlight.js/styles/github.css";
+import { HeightAnimatedPre } from "./animatedpre";
 
 const VOID_TAGS = [
 	"img",
@@ -46,30 +47,9 @@ export function renderToken(token: MarkedToken, key: number) {
 	}
 	if (token.tag === "code") {
 		if (token.type === "fence") {
-			// try {
-			// 	const highlighted = hljs.highlight(token.content, {
-			// 		language: token.info,
-			//         ignoreIllegals: true
-			// 	}).value;
-			// 	return (
-			// 		<pre key={key}>
-			// 			<code
-			// 				dangerouslySetInnerHTML={{ __html: highlighted }}
-			// 			></code>
-			// 		</pre>
-			// 	);
-			// } catch (e) {
-			// 	return (
-			// 		<pre key={key}>
-			// 			<code>{token.content}</code>
-			// 		</pre>
-			// 	);
-			// }
 			return (
-				<pre key={key}>
-					<code>{token.content}</code>
-				</pre>
-			);
+                <HeightAnimatedPre key={key} content={token.content} />
+            );
 		} else {
 			return <code key={key}>{token.content}</code>;
 		}
