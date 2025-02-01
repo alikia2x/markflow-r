@@ -49,7 +49,7 @@ function App() {
 			{/* Config Button for Mobile */}
 			<button
 				onClick={() => setShowConfig(!showConfig)}
-				className="w-12 h-12 fixed top-4 left-4 z-50 p-2 bg-gray-200/70 backdrop-blur-lg rounded-full 
+				className="w-12 h-12 fixed top-4 right-4 z-50 p-2 bg-gray-200/70 backdrop-blur-lg rounded-full 
 				flex justify-center items-center text-zinc-700"
 			>
 				{!showConfig && (
@@ -85,7 +85,7 @@ function App() {
 
 			{/* Config Modal */}
 			<div
-				className={`fixed inset-0 bg-white/30 backdrop-blur-xl transition-[scale,opacity] duration-300 ease-in-out ${
+				className={`fixed inset-0 bg-white/30 backdrop-blur-xl duration-300 ease-in-out ${
 					showConfig
 						? "opacity-100 scale-100 z-40"
 						: "opacity-0 scale-150 z-[-10]"
@@ -98,6 +98,7 @@ function App() {
 						<input
 							type="text"
 							value={config.baseURL}
+							spellCheck="false"
 							onChange={(e) =>
 								setConfig({
 									...config,
@@ -122,6 +123,7 @@ function App() {
 						<label>Model:</label>
 						<input
 							value={config.model}
+							spellCheck="false"
 							onChange={(e) =>
 								setConfig({ ...config, model: e.target.value })
 							}
@@ -164,9 +166,8 @@ function App() {
 							aria-label="发送提示"
 							data-testid="send-button"
 							className="flex h-9 w-9 items-center justify-center rounded-full 
-									transition-colors hover:opacity-70 duration-200
-									dark:disabled:text-token-main-surface-secondary bg-black text-white
-									 disabled:bg-[#D7D7D7]"
+									transition-colors hover:opacity-70 duration-200 bg-black text-white"
+							onClick={handleSend}
 						>
 							<svg
 								width="32"
@@ -211,7 +212,7 @@ function App() {
 								</div>
 							</div>
 						))}
-						<div className="h-20"></div>
+						<div className="h-32"></div>
 					</ScrollableContainer>
 				</div>
 				<div className="md:w-1/6 lg:w-1/4 mx-auto"></div>

@@ -11,15 +11,15 @@ import ResizeObserver from "resize-observer-polyfill";
 import { throttle } from "lodash-es";
 
 const SCROLL_THRESHOLD = 250;
-const SCROLL_THROTTLE = 300;
+const SCROLL_THROTTLE = 500;
 
 const ScrollableContainer = ({ children, contentIndicator }) => {
     const [spring, setSpring] = useSpring(() => ({
         y: 0,
         config: {
             mass: 1,
-            tension: 160,
-            friction: 40,
+            tension: 170,
+            friction: 35,
             clamp: true,
         },
         onRest: () => {
@@ -77,7 +77,9 @@ const ScrollableContainer = ({ children, contentIndicator }) => {
             setContentHeight(newHeight);
 
             if (autoScroll) {
-                const targetY = Math.max(0, newHeight - containerHeightRef.current);
+                let targetY = Math.max(0, newHeight - containerHeightRef.current) + 32;
+                if (targetY <= 32) 
+                    targetY = 0;
                 throttledScroll(targetY);
             }
         });
