@@ -157,7 +157,7 @@ const ScrollableContainer = ({ children, contentIndicator }) => {
     return (
         <div
             ref={containerRef}
-            className="relative h-full mb-4 overflow-y-hidden"
+            className="relative h-full overflow-y-hidden"
         >
             <a.div
                 style={{
