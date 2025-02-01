@@ -1,30 +1,4 @@
-export interface Token {
-    type: string;
-    tag: string;
-    attrs: Array<[string, string]> | null;
-    map: [number, number] | null;
-    nesting: number;
-    level: number;
-    children: Token[] | null;
-    content: string;
-    markup: string;
-    info: string;
-    meta: unknown;
-    block: boolean;
-    hidden: boolean;
-    attrIndex(name: string): number;
-    attrPush(attrData: [string, string]): void;
-    attrSet(name: string, value: string): void;
-    attrGet(name: string): string | null;
-    attrJoin(name: string, value: string): void;
-}
-
-export interface ProcessedToken {
-    tag?: string;
-    content?: string;
-    attrs?: { [key: string]: string };
-    children?: ProcessedToken[];
-}
+import { ProcessedToken, Token } from "./global";
 
 export function preprocess(tokens: Token[]): ProcessedToken[] {
     const root: ProcessedToken = { children: [] };
@@ -109,7 +83,10 @@ function createNode(token: Token): ProcessedToken {
 }
 
 function processStandaloneToken(token: Token): ProcessedToken {
-    const result: ProcessedToken = {};
+    const result: ProcessedToken = {
+        type: token.type,
+        info: token.info ?? undefined
+    };
 
     if (token.tag) result.tag = token.tag;
     if (token.attrs?.length) result.attrs = Object.fromEntries(token.attrs);

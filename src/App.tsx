@@ -1,10 +1,8 @@
-import { useState, useEffect, Profiler } from "react";
-import StreamMarkdown from "./StreamMarkdown";
-import { bigMd } from "./consts";
+import { useState, useEffect } from "react";
+import MarkdownContainer from "./ScrollContainer";
 
-const demoContent = `${bigMd}`;
-`# Nested Example
-
+const demoContent = `# Nested Example
+ 
 A \`simple\` **inline** *marks* example with ***nested***.
 
 ## List
@@ -20,9 +18,30 @@ A \`simple\` **inline** *marks* example with ***nested***.
 
 ## Code block
 
-    \`\`\`python
-    print("Hello, world!")
-    \`\`\`
+Here is a quick sort code written in [Swift](https://swift.org/).
+
+\`\`\`swift
+func quickSort(_ arr: inout [Int], low: Int, high: Int) {
+    if low < high {
+        let pi = partition(&arr, low: low, high: high)
+        quickSort(&arr, low: low, high: pi - 1)
+        quickSort(&arr, low: pi + 1, high: high)
+    }
+}
+
+func partition(_ arr: inout [Int], low: Int, high: Int) -> Int {
+    let pivot = arr[high]
+    var i = low - 1
+    for j in low..<high {
+        if arr[j] <= pivot {
+            i += 1
+            arr.swapAt(i, j)
+        }
+    }
+    arr.swapAt(i + 1, high)
+    return i + 1
+}
+\`\`\`
 
 ## Link
 
@@ -39,17 +58,9 @@ const totalLength = demoContent.length;
 
 function App() {
 	const [currentMarkdown, setCurrentMarkdown] = useState("");
-	const [renderTime, setRenderTime] = useState(0);
 
-	const onRender = (
-		id: string,
-		phase: "mount" | "update" | "update",
-		actualDuration: number
-	) => {
-		setRenderTime(actualDuration);
-	};
 	const TOKEN_LENGTH = 6;
-	const TOKENS_PER_SEC = 30;
+	const TOKENS_PER_SEC = 20;
 	const INTERVAL = 1000 / TOKENS_PER_SEC;
 
 	useEffect(() => {
@@ -73,18 +84,15 @@ function App() {
 		}, INTERVAL);
 
 		return () => clearInterval(interval);
-	}, []);
+	}, [INTERVAL]);
 
 	return (
 		<div className="h-dvh relative flex flex-col">
-			{/* <p>Render Time: {renderTime.toFixed(1)} ms</p>
 			<p>
 				Progress:{" "}
 				{((currentMarkdown.length / totalLength) * 100).toFixed(1)}%
-			</p> */}
-			{/* <Profiler id="StreamMarkdown" onRender={onRender}> */}
-			<StreamMarkdown content={currentMarkdown} />
-			{/* </Profiler> */}
+			</p>
+			<MarkdownContainer content={currentMarkdown} />
 		</div>
 	);
 }
