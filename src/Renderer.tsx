@@ -1,6 +1,4 @@
 import { MarkedToken } from "./global";
-import hljs from "highlight.js";
-import "highlight.js/styles/github.css";
 import { HeightAnimatedPre } from "./animatedpre";
 
 const VOID_TAGS = [
