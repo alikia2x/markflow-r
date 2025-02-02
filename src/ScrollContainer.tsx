@@ -1,17 +1,8 @@
-import {
-    useLayoutEffect,
-    useRef,
-    useState,
-    useEffect,
-    useMemo,
-    useCallback,
-} from "react";
+import { useLayoutEffect, useRef, useEffect, useCallback, useState } from "react";
 import { animated as a, useSpring } from "react-spring";
 import ResizeObserver from "resize-observer-polyfill";
-import { throttle } from "lodash-es";
-
-const SCROLL_THRESHOLD = 250;
-const SCROLL_THROTTLE = 500;
+import { useAtom } from "jotai";
+import { autoScrollAtom } from "./scrollAtom";
 
 const ScrollableContainer = ({ children, contentIndicator }) => {
     const [spring, setSpring] = useSpring(() => ({
@@ -22,50 +13,13 @@ const ScrollableContainer = ({ children, contentIndicator }) => {
             friction: 35,
             clamp: true,
         },
-        onRest: () => {
-            isAnimating.current = false;
-        },
     }));
 
     const containerRef = useRef(null);
     const viewportRef = useRef(null);
-    const isAnimating = useRef(false);
-    const [autoScroll, setAutoScroll] = useState(true);
+    const [autoScroll, setAutoScroll] = useAtom(autoScrollAtom);
     const [contentHeight, setContentHeight] = useState(0);
     const [containerHeight, setContainerHeight] = useState(0);
-    const contentHeightRef = useRef(contentHeight);
-    const containerHeightRef = useRef(0);
-
-    const [stillUpdating, setStillUpdating] = useState(false);
-    const contentUpdateTimeoutRef = useRef(null);
-
-    useEffect(() => {
-        // 每次 content 更新时，重置定时器
-        setStillUpdating(true);
-        if (contentUpdateTimeoutRef.current) {
-            clearTimeout(contentUpdateTimeoutRef.current);
-        }
-
-        // 设置一个 1 秒的定时器，如果 1 秒内没有更新，则认为 content 停止更新
-        contentUpdateTimeoutRef.current = setTimeout(() => {
-            setStillUpdating(false);
-        }, 1000);
-
-        // 清除定时器
-        return () => {
-            if (contentUpdateTimeoutRef.current) {
-                clearTimeout(contentUpdateTimeoutRef.current);
-            }
-        };
-    }, [contentIndicator]);
-
-    // 同步最新高度到ref
-    useEffect(() => {
-        contentHeightRef.current = contentHeight;
-    }, [contentHeight]);
-    useEffect(() => {
-        containerHeightRef.current = containerHeight;
-    }, [containerHeight]);
 
     // 内容尺寸变化观测
     useLayoutEffect(() => {
@@ -77,16 +31,14 @@ const ScrollableContainer = ({ children, contentIndicator }) => {
             setContentHeight(newHeight);
 
             if (autoScroll) {
-                let targetY = Math.max(0, newHeight - containerHeightRef.current) + 32;
-                if (targetY <= 32) 
-                    targetY = 0;
-                throttledScroll(targetY);
+                const targetY = Math.max(0, newHeight - containerHeight);
+                setSpring.start({ y: -targetY });
             }
         });
 
         ro.observe(viewport);
         return () => ro.disconnect();
-    }, [autoScroll]);
+    }, [autoScroll, containerHeight, setSpring]);
 
     // 容器尺寸变化观测
     useLayoutEffect(() => {
@@ -96,56 +48,34 @@ const ScrollableContainer = ({ children, contentIndicator }) => {
         const ro = new ResizeObserver(([entry]) => {
             const newHeight = entry.contentRect.height;
             setContainerHeight(newHeight);
-            containerHeightRef.current = entry.contentRect.height;
+
             if (autoScroll) {
-                const targetY = Math.max(0, contentHeightRef.current - entry.contentRect.height);
+                const targetY = Math.max(0, contentHeight - newHeight);
                 setSpring.start({ y: -targetY });
             }
         });
 
         ro.observe(container);
         return () => ro.disconnect();
-    }, [autoScroll, setSpring]);
-
-    // 自动滚动逻辑
-    const throttledScroll = useMemo(() => throttle((targetY) => {
-        isAnimating.current = true;
-        setSpring.start({
-            y: -targetY,
-            immediate: targetY === 0, // 当滚动到顶部时立即跳转
-        });
-    }, SCROLL_THROTTLE), [setSpring]);
+    }, [autoScroll, contentHeight, setSpring]);
 
     // 处理滚轮事件
-    const handleWheel = useCallback((e: WheelEvent) => {
+    const handleWheel = useCallback((e) => {
         e.preventDefault();
+        setAutoScroll(false); // 只要鼠标开始滚动就关闭自动滚动
+
         const delta = e.deltaY;
         const currentY = -spring.y.get();
-        const maxScroll = Math.max(0, contentHeightRef.current - containerHeightRef.current);
-        
+        const maxScroll = Math.max(0, contentHeight - containerHeight);
+
         let newY = currentY + delta;
         newY = Math.max(0, Math.min(newY, maxScroll));
-        
-        // 更新自动滚动状态
-        const isNearBottom = newY >= maxScroll - SCROLL_THRESHOLD;
-        if (isAnimating.current == false || stillUpdating == false) {
-            setAutoScroll(false);
-        }
-        else if (autoScroll === false) {
-            setAutoScroll(isNearBottom);
-        }
-        else {
-            setAutoScroll(false)
-        }
-        isAnimating.current = true;
+
         setSpring.start({
             y: -newY,
-            onRest: () => {
-                isAnimating.current = false;
-            },
-            immediate: true
+            immediate: true,
         });
-    }, [autoScroll, setSpring, spring.y, stillUpdating]);
+    }, [contentHeight, containerHeight, setSpring, spring.y, setAutoScroll]);
 
     // 滚轮事件监听
     useEffect(() => {
