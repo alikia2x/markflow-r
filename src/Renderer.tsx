@@ -54,7 +54,7 @@ export function renderToken(token: MarkedToken, key: number) {
 	}
 	if (token.content) {
 		return (
-			<span key={key} className="fade-in" style={styleObject}>
+			<span key={key} className={token.status ? "fade-in" : ""} style={styleObject}>
 				{token.content}
 			</span>
 		);

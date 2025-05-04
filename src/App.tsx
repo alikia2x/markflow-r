@@ -63,13 +63,13 @@ function App() {
 				onClick={handleSend}
 			/>
 
-			<div className="h-dvh relative flex flex-col md:flex-row">
-				<div className="md:w-1/6 lg:w-1/4 mx-auto"></div>
+			<div className="h-dvh relative flex md:flex-row">
+				<div className="w-4 md:w-1/6 lg:w-1/4 mx-auto"></div>
 
 				{/* Chat Messages Component */}
 				<ChatMessages messages={messages} />
 
-				<div className="md:w-1/6 lg:w-1/4 mx-auto"></div>
+				<div className="w-4 md:w-1/6 lg:w-1/4 mx-auto"></div>
 			</div>
 		</>
 	);

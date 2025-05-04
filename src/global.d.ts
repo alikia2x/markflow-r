@@ -8,7 +8,7 @@ export interface ProcessedToken {
     attrs?: { [key: string]: string };
     children?: ProcessedToken[];
     type?: string;
-    info?: string
+    info?: string;
 }
 
 export interface Token {
